@@ -15,10 +15,13 @@ public:
 	// Sets default values for this actor's properties
 	ALantern();
 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=ID)
+	int LitId = 0;
 
 
 private:
@@ -34,4 +37,14 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Lantern")
 	void SetMaterial(UMaterialInterface* Material);
+
+	int GetLitId() const
+	{
+		return LitId;
+	}
+
+	void SetLitId(int NewLitId)
+	{
+		LitId = NewLitId;
+	}
 };

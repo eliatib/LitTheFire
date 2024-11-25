@@ -108,9 +108,6 @@ void AMyCharacter::Interact()
 				if (LanternActor != nullptr)
 				{
 					LanternActor->AttachLantern(this);
-					ALitGameMode* Gm = Cast<ALitGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-					if (Gm != nullptr)
-						Gm->ChangeLitId(1);
 				}
 				return;
 			}
@@ -119,9 +116,7 @@ void AMyCharacter::Interact()
 				if (const ALitFire* Lf = Cast<ALitFire>(Hit.GetActor()); Lf != nullptr)
 				{
 					LanternActor->SetMaterial(Lf->GetMaterial());
-					ALitGameMode* Gm = Cast<ALitGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-					if (Gm != nullptr)
-						Gm->ChangeLitId(Lf->GetLitId());
+					LanternActor->SetLitId(Lf->GetLitId());
 				}
 			}
 		}

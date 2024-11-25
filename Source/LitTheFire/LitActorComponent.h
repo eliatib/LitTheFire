@@ -15,17 +15,21 @@ class LITTHEFIRE_API ULitActorComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	ULitActorComponent();
-
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=ID)
 	int LitGroup = 1;
+
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
+	UFUNCTION(BlueprintCallable)
+	int GetLitGroup() const
+	{
+		return LitGroup;
+	}
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
 };

@@ -18,11 +18,6 @@ ULitActorComponent::ULitActorComponent()
 void ULitActorComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	AActor* Actor = GetOwner();
-	Actor->SetActorEnableCollision(false);
-	Actor->SetActorHiddenInGame(true);
-	// ...
-	
 }
 
 

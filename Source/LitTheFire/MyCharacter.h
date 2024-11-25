@@ -33,9 +33,6 @@ public:
 	float InteractRange = 200.f;
 	UPROPERTY(EditAnywhere, Category=InteractParams)
 	TEnumAsByte<ECollisionChannel> TraceChannelProperty = ECC_Pawn;
-
-	//UPROPERTY(EditAnywhere, Category=InteractParams)
-	//UStaticMeshComponent* ItemHand;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -51,11 +48,6 @@ public:
 	{
 		return LanternActor == nullptr;
 	}
-	
-
-	/*UPROPERTY(EditAnywhere, Category=Camera)
-	/*UPROPERTY(EditAnywhere, Category=Camera)
-	class UCameraComponent* CharacterCamera;*/
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
