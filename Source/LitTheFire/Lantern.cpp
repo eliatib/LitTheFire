@@ -3,7 +3,9 @@
 
 #include "Lantern.h"
 
+#include "LitActor.h"
 #include "MyCharacter.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ALantern::ALantern()
@@ -12,13 +14,33 @@ ALantern::ALantern()
 	PrimaryActorTick.bCanEverTick = true;
 	LanternMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Lantern Mesh"));
 	LanternMesh->SetupAttachment(RootComponent);
+	RefreshLitActorList();
+}
+
+void ALantern::RefreshLitActorList()
+{
+	LitActors.Empty();
+	if (!LitActorClass) return;
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), LitActorClass.Get(),Actors);
+	for (AActor* Actor : Actors)
+	{
+		ALitActor* Lit = Cast<ALitActor>(Actor);
+		if (Lit)
+		{
+			if (Lit->GetLitGroup() == LitId)
+			{
+				LitActors.Add(Lit);
+			}
+		}
+	}
 }
 
 // Called when the game starts or when spawned
 void ALantern::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	RefreshLitActorList();
 }
 
 void ALantern::AttachLantern(AMyCharacter* PlayerCharacter)
@@ -43,5 +65,14 @@ void ALantern::SetMaterial(UMaterialInterface* Material)
 void ALantern::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	for (ALitActor* LitActor : LitActors)
+	{
+		if (GetDistanceTo(LitActor) < 500.f)
+		{
+			FVector LanternLocation = GetActorTransform().GetLocation();
+			FLinearColor LanternColor = FLinearColor(LanternLocation.X, LanternLocation.Y, LanternLocation.Z, 1.f);
+			LitActor->SetPos(LanternColor);
+		}
+	}
 }
 

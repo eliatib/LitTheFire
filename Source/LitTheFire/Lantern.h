@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Lantern.generated.h"
 
+class ALitActor;
+
 UCLASS()
 class LITTHEFIRE_API ALantern : public AActor
 {
@@ -14,6 +16,7 @@ class LITTHEFIRE_API ALantern : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ALantern();
+	void RefreshLitActorList();
 
 
 protected:
@@ -46,5 +49,12 @@ public:
 	void SetLitId(int NewLitId)
 	{
 		LitId = NewLitId;
+		RefreshLitActorList();
 	}
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AActor> LitActorClass;
+	UPROPERTY(visibleAnywhere)
+	TArray<ALitActor*> LitActors;
 };
