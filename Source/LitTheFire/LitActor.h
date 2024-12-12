@@ -17,6 +17,7 @@ class LITTHEFIRE_API ALitActor : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ALitActor();
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -30,18 +31,23 @@ public:
 private:
 	UPROPERTY(EditAnywhere)
 	int32 LitGroup = 0;
+	
+protected:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* Mesh;
 	UPROPERTY(EditDefaultsOnly)
 	UMaterialInterface* Material;
 	UPROPERTY(VisibleAnywhere)
 	UMaterialInstanceDynamic* MID;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	FLinearColor Pos;
 
 public:
+	UFUNCTION(BlueprintCallable)
 	FLinearColor GetPos() const;
-	void SetPos(const FLinearColor& NewPos);
+	UFUNCTION(BlueprintCallable)
+	void SetPos(const FLinearColor NewPos);
+	UFUNCTION(BlueprintCallable)
 	void SetCollision(bool IsEnabled);
 
 private:

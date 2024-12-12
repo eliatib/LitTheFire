@@ -26,21 +26,17 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=ID)
 	int LitId = 0;
 
-
-private:
-	UPROPERTY(EditAnywhere,Category=component)
-	USkeletalMeshComponent* LanternMesh;
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	UFUNCTION(BlueprintCallable, Category = "Lantern")
-	void AttachLantern(AMyCharacter* PlayerCharacter);
-
+	virtual void OnConstruction(const FTransform& Transform) override;
+	
 	UFUNCTION(BlueprintCallable, Category = "Lantern")
 	void SetMaterial(UMaterialInterface* Material);
 
+	UFUNCTION(BlueprintCallable, Category = "Lantern")
+	void VerifyPositionToLitActors();
+	
 	int GetLitId() const
 	{
 		return LitId;
@@ -57,4 +53,13 @@ public:
 	TSubclassOf<AActor> LitActorClass;
 	UPROPERTY(visibleAnywhere)
 	TArray<ALitActor*> LitActors;
+	UPROPERTY(EditAnywhere,Category=component)
+	USkeletalMeshComponent* LanternMesh;
 };
+
+inline void ALantern::OnConstruction(const FTransform& Transform)
+{
+	RefreshLitActorList();
+	Super::OnConstruction(Transform);
+}
+

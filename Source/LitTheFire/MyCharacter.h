@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "MyCharacter.generated.h"
 
+class ALantern;
 class UInputAction;
 UCLASS()
 class LITTHEFIRE_API AMyCharacter : public ACharacter
@@ -30,7 +31,7 @@ public:
 	UInputAction* LookAction;
 	
 	UPROPERTY(EditAnywhere, Category=InteractParams)
-	float InteractRange = 200.f;
+	float InteractRange = 250.f;
 	UPROPERTY(EditAnywhere, Category=InteractParams)
 	TEnumAsByte<ECollisionChannel> TraceChannelProperty = ECC_Pawn;
 	
@@ -40,13 +41,16 @@ protected:
 	void Interact();
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void GrabLantern(ALantern* Lantern,FName SocketName);
 
-	class ALantern* LanternActor;
+	UPROPERTY()
+	ALantern* LanternActor;
 
 public:
-	bool AsGrabLantern() const
+	UFUNCTION(BlueprintCallable)
+	bool HasGrabLantern() const
 	{
-		return LanternActor == nullptr;
+		return LanternActor != nullptr;
 	}
 
 	// Called every frame
@@ -54,7 +58,7 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	
-
 };
+
+

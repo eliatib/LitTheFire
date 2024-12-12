@@ -5,25 +5,14 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Lantern.h"
+#include "LanternHook.h"
 #include "LitFire.h"
-#include "LitGameMode.h"
-#include "MovieSceneTracksComponentTypes.h"
-#include "UHandGrabber.h"
-#include "Camera/CameraComponent.h"
-#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	/*ItemHand = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemHand"));
-	ItemHand->SetupAttachment(GetMesh());
-	ItemHand->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale,TEXT("LanternSocket"));
-	/*CharacterCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	CharacterCamera->bUsePawnControlRotation = true;
-	CharacterCamera->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "head");
-*/	
 }
 
 // Called when the game starts or when spawned
@@ -98,29 +87,38 @@ void AMyCharacter::Interact()
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor(this);
 		Params.AddIgnoredActor(GetOwner());
-		GetWorld()->LineTraceSingleByChannel(Hit,CamLoc,End,ECollisionChannel::ECC_PhysicsBody, Params);
+		GetWorld()->LineTraceSingleByChannel(Hit,CamLoc,End,ECollisionChannel::ECC_WorldDynamic, Params);
 		DrawDebugLine(GetWorld(),CamLoc,End,FColor::Red,true);
 		if (Hit.GetActor() != nullptr)
 		{
-			if (LanternActor == nullptr && Hit.GetActor()->GetClass()->IsChildOf(ALantern::StaticClass()))
+			if (Hit.GetActor()->GetClass()->IsChildOf(ALanternHook::StaticClass()))
 			{
-				LanternActor = Cast<ALantern>(Hit.GetActor());
-				if (LanternActor != nullptr)
+				ALanternHook* Hook = Cast<ALanternHook>(Hit.GetActor());
+				if (Hook != nullptr)
 				{
-					LanternActor->AttachLantern(this);
-				}
-				return;
-			}
-			if (LanternActor != nullptr && Hit.GetActor()->GetClass()->IsChildOf(ALitFire::StaticClass()))
-			{
-				if (const ALitFire* Lf = Cast<ALitFire>(Hit.GetActor()); Lf != nullptr)
-				{
-					LanternActor->SetMaterial(Lf->GetMaterial());
-					LanternActor->SetLitId(Lf->GetLitId());
+					ALantern* HookLantern = Hook->GetAttachLantern();
+					
+					GrabLantern(HookLantern,TEXT("LanternSocket"));
 				}
 			}
 		}
 	}
+}
+
+void AMyCharacter::GrabLantern(ALantern* Lantern,FName SocketName)
+{
+	if (Lantern != nullptr)
+	{
+		Lantern->LanternMesh->SetSimulatePhysics(false);
+		Lantern->LanternMesh->SetEnableGravity(false);
+		Lantern->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+		if (ALanternHook* Hook = Cast<ALanternHook>(Lantern->GetOwner()))
+		{
+			Hook->SetAttachLantern(LanternActor);
+		}
+		Lantern->SetOwner(this);
+	}
+	LanternActor = Lantern;
 }
 
 void AMyCharacter::Look(const FInputActionValue& Value)

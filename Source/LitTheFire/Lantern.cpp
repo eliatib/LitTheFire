@@ -25,12 +25,12 @@ void ALantern::RefreshLitActorList()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), LitActorClass.Get(),Actors);
 	for (AActor* Actor : Actors)
 	{
-		ALitActor* Lit = Cast<ALitActor>(Actor);
-		if (Lit)
+		if (ALitActor* Lit = Cast<ALitActor>(Actor))
 		{
 			if (Lit->GetLitGroup() == LitId)
 			{
 				LitActors.Add(Lit);
+				VerifyPositionToLitActors();
 			}
 		}
 	}
@@ -43,19 +43,6 @@ void ALantern::BeginPlay()
 	RefreshLitActorList();
 }
 
-void ALantern::AttachLantern(AMyCharacter* PlayerCharacter)
-{
-	// Check that the character is valid, and has no rifle yet
-	if (PlayerCharacter == nullptr || PlayerCharacter->AsGrabLantern())
-	{
-		return;
-	}
-	LanternMesh->SetSimulatePhysics(false);
-	LanternMesh->SetEnableGravity(false);
-	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	AttachToComponent(PlayerCharacter->GetMesh(), AttachmentRules, FName(TEXT("LanternSocket")));
-}
-
 void ALantern::SetMaterial(UMaterialInterface* Material)
 {
 	LanternMesh->SetMaterial(1, Material);
@@ -65,11 +52,17 @@ void ALantern::SetMaterial(UMaterialInterface* Material)
 void ALantern::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	VerifyPositionToLitActors();
+
+}
+
+void ALantern::VerifyPositionToLitActors()
+{
 	for (ALitActor* LitActor : LitActors)
 	{
-		if (GetDistanceTo(LitActor) < 500.f)
+		if (LitActor != nullptr && GetDistanceTo(LitActor) < 800.f)
 		{
-			FVector LanternLocation = GetActorTransform().GetLocation();
+			FVector LanternLocation = GetActorLocation();
 			FLinearColor LanternColor = FLinearColor(LanternLocation.X, LanternLocation.Y, LanternLocation.Z, 1.f);
 			LitActor->SetPos(LanternColor);
 		}
