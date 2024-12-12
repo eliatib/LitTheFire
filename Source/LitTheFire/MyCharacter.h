@@ -8,6 +8,7 @@
 #include "MyCharacter.generated.h"
 
 class ALantern;
+class ALanternHook;
 class UInputAction;
 UCLASS()
 class LITTHEFIRE_API AMyCharacter : public ACharacter
@@ -41,7 +42,7 @@ protected:
 	void Interact();
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void GrabLantern(ALantern* Lantern,FName SocketName);
+	void GrabLantern(ALanternHook* Hook,FName SocketName);
 
 	UPROPERTY()
 	ALantern* LanternActor;

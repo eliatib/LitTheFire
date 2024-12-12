@@ -96,29 +96,25 @@ void AMyCharacter::Interact()
 				ALanternHook* Hook = Cast<ALanternHook>(Hit.GetActor());
 				if (Hook != nullptr)
 				{
-					ALantern* HookLantern = Hook->GetAttachLantern();
-					
-					GrabLantern(HookLantern,TEXT("LanternSocket"));
+					GrabLantern(Hook,TEXT("LanternSocket"));
 				}
 			}
 		}
 	}
 }
 
-void AMyCharacter::GrabLantern(ALantern* Lantern,FName SocketName)
+void AMyCharacter::GrabLantern(ALanternHook* Hook,FName SocketName)
 {
-	if (Lantern != nullptr)
+	ALantern* HookLantern = Hook->GetAttachLantern();
+	if (HookLantern != nullptr)
 	{
-		Lantern->LanternMesh->SetSimulatePhysics(false);
-		Lantern->LanternMesh->SetEnableGravity(false);
-		Lantern->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
-		if (ALanternHook* Hook = Cast<ALanternHook>(Lantern->GetOwner()))
-		{
-			Hook->SetAttachLantern(LanternActor);
-		}
-		Lantern->SetOwner(this);
+		HookLantern->LanternMesh->SetSimulatePhysics(false);
+		HookLantern->LanternMesh->SetEnableGravity(false);
+		HookLantern->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+		HookLantern->SetOwner(this);
 	}
-	LanternActor = Lantern;
+	Hook->SetAttachLantern(LanternActor);
+	LanternActor = HookLantern;
 }
 
 void AMyCharacter::Look(const FInputActionValue& Value)
