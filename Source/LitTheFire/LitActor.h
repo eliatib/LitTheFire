@@ -31,15 +31,15 @@ public:
 private:
 	UPROPERTY(EditAnywhere)
 	int32 LitGroup = 0;
-	
+
 protected:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* Mesh;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	UMaterialInterface* Material;
 	UPROPERTY(VisibleAnywhere)
 	UMaterialInstanceDynamic* MID;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	FLinearColor Pos;
 
 public:
@@ -57,5 +57,11 @@ private:
 public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetLitGroup() const;
+
+	UPROPERTY(EditAnywhere)
+	float LightRad = 300.f;;
+	UPROPERTY(EditAnywhere)
+	float ColRad = 500.f;;
+
 };
 

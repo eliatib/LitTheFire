@@ -22,12 +22,15 @@ ALitActor::ALitActor()
 void ALitActor::OnConstruction(const FTransform& Transform)
 {
 	SetActorEnableCollision(!bInverseTransparency);
+	Pos.R = GetActorLocation().X +10000;
+	Pos.B = GetActorLocation().Y +10000;
+	Pos.G = GetActorLocation().Z +10000;
 	if (!Material) return;
 	MID = Mesh->CreateDynamicMaterialInstance(0,Material);
 	if (!MID) return;
 	MID->SetVectorParameterValue(TEXT("pos"),Pos);
 	MID->SetVectorParameterValue(TEXT("Transparency"),bInverseTransparency? FColor::Green : FColor::Red );
-	SetCollision(true);
+	MID->SetScalarParameterValue(TEXT("ShowRadius"),LightRad + 100);
 	TArray<AActor*> Actors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALantern::StaticClass(),Actors);
 	for (AActor* Actor : Actors)
@@ -44,7 +47,7 @@ void ALitActor::OnConstruction(const FTransform& Transform)
 void ALitActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -64,7 +67,7 @@ void ALitActor::SetPos(const FLinearColor NewPos)
 	Pos = NewPos;
 	MID->SetVectorParameterValue(TEXT("pos"),Pos);
 	auto Distance = (GetActorLocation() - FVector(Pos.R,Pos.G,Pos.B)).Size();
-	SetCollision(Distance < 300.f);
+	SetCollision(Distance < ColRad);
 }
 
 int32 ALitActor::GetLitGroup() const

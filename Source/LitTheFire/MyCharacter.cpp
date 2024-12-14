@@ -2,11 +2,17 @@
 
 
 #include "MyCharacter.h"
+
+#include "CharacterController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Lantern.h"
 #include "LanternHook.h"
 #include "LitFire.h"
+#include "LitGameMode.h"
+#include "Blueprint/UserWidget.h"
+#include "GameFramework/GameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -36,7 +42,33 @@ void AMyCharacter::BeginPlay()
 void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (AController* OC = GetController())
+	{
+		FHitResult Hit;
+		FVector CamLoc;
+		FRotator CamRot;
+		OC->GetPlayerViewPoint(CamLoc,CamRot);
+		FVector End = CamLoc + CamRot.Vector() * InteractRange;
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+		Params.AddIgnoredActor(GetOwner());
+		GetWorld()->LineTraceSingleByChannel(Hit,CamLoc,End,ECollisionChannel::ECC_WorldDynamic, Params);
+		if (Hit.GetActor() != nullptr)
+		{
+			if (Hit.GetActor()->GetClass()->IsChildOf(ALanternHook::StaticClass()))
+			{
+				if (ACharacterController* CC = Cast<ACharacterController>(OC))
+				{
+				CC->ShowWidget();
+				return;
+				}
+			}
+		}
+		if (ACharacterController* CC = Cast<ACharacterController>(OC))
+		{
+			CC->HideWidget();
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -76,7 +108,6 @@ void AMyCharacter::Move(const FInputActionValue& Value)
 
 void AMyCharacter::Interact()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Interact"));
 	if (AController* OC = GetController())
 	{
 		FHitResult Hit;
@@ -88,7 +119,6 @@ void AMyCharacter::Interact()
 		Params.AddIgnoredActor(this);
 		Params.AddIgnoredActor(GetOwner());
 		GetWorld()->LineTraceSingleByChannel(Hit,CamLoc,End,ECollisionChannel::ECC_WorldDynamic, Params);
-		DrawDebugLine(GetWorld(),CamLoc,End,FColor::Red,true);
 		if (Hit.GetActor() != nullptr)
 		{
 			if (Hit.GetActor()->GetClass()->IsChildOf(ALanternHook::StaticClass()))
@@ -115,7 +145,13 @@ void AMyCharacter::GrabLantern(ALanternHook* Hook,FName SocketName)
 	}
 	Hook->SetAttachLantern(LanternActor);
 	LanternActor = HookLantern;
+	if (LanternActor!=nullptr && LanternActor->LanternClin)
+	{
+		LanternActor->LanternClin = false;
+	}
 }
+
+
 
 void AMyCharacter::Look(const FInputActionValue& Value)
 {

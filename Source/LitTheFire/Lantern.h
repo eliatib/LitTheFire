@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Lantern.generated.h"
 
+class UPointLightComponent;
+class APointLight;
 class ALitActor;
 
 UCLASS()
@@ -17,6 +19,7 @@ public:
 	// Sets default values for this actor's properties
 	ALantern();
 	void RefreshLitActorList();
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 
 protected:
@@ -26,16 +29,26 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=ID)
 	int LitId = 0;
 
+	
+
+
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* MaterialLight;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UMaterialInstanceDynamic* MID;
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void OnConstruction(const FTransform& Transform) override;
-	
-	UFUNCTION(BlueprintCallable, Category = "Lantern")
-	void SetMaterial(UMaterialInterface* Material);
 
 	UFUNCTION(BlueprintCallable, Category = "Lantern")
 	void VerifyPositionToLitActors();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool StartLantern = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool LanternClin = false;
 	
 	int GetLitId() const
 	{
@@ -55,6 +68,9 @@ public:
 	TArray<ALitActor*> LitActors;
 	UPROPERTY(EditAnywhere,Category=component)
 	USkeletalMeshComponent* LanternMesh;
+	
+	UPROPERTY(EditAnywhere,blueprintReadWrite,Category=Light)
+	UPointLightComponent* Light;
 };
 
 inline void ALantern::OnConstruction(const FTransform& Transform)

@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "LanternHook.generated.h"
 
+class APointLight;
 class ALantern;
 
 UCLASS()
@@ -24,6 +25,7 @@ protected:
 private:
 	UPROPERTY(EditAnywhere)
 	ALantern* AttachedLantern;
+
 
 public:	
 	// Called every frame

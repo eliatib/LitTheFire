@@ -5,6 +5,8 @@
 
 #include "LitActor.h"
 #include "MyCharacter.h"
+#include "Components/PointLightComponent.h"
+#include "Engine/PointLight.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -14,7 +16,9 @@ ALantern::ALantern()
 	PrimaryActorTick.bCanEverTick = true;
 	LanternMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Lantern Mesh"));
 	LanternMesh->SetupAttachment(RootComponent);
-	RefreshLitActorList();
+	Light = CreateDefaultSubobject<UPointLightComponent>(TEXT("PLight"));
+	Light->SetupAttachment(LanternMesh);
+
 }
 
 void ALantern::RefreshLitActorList()
@@ -41,11 +45,23 @@ void ALantern::BeginPlay()
 {
 	Super::BeginPlay();
 	RefreshLitActorList();
-}
-
-void ALantern::SetMaterial(UMaterialInterface* Material)
-{
-	LanternMesh->SetMaterial(1, Material);
+	if (!MaterialLight) return;
+	MID = LanternMesh->CreateDynamicMaterialInstance(1,MaterialLight);
+	if (!MID || !Light) return;
+	MID->SetVectorParameterValue(TEXT("Light Color"),Light->GetLightColor());
+	RefreshLitActorList();
+	if (StartLantern)
+	{
+		AActor* Player =  UGameplayStatics::GetPlayerPawn(GetWorld(),0);
+		if (AMyCharacter* MyCharacter = Cast<AMyCharacter>(Player))
+		{
+			LanternMesh->SetSimulatePhysics(false);
+			LanternMesh->SetEnableGravity(false);
+			AttachToComponent(MyCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, "LanternSocket");
+			SetOwner(MyCharacter);
+			MyCharacter->SetLanternActor(this);
+		}
+	}
 }
 
 // Called every frame
@@ -60,7 +76,7 @@ void ALantern::VerifyPositionToLitActors()
 {
 	for (ALitActor* LitActor : LitActors)
 	{
-		if (LitActor != nullptr && GetDistanceTo(LitActor) < 800.f)
+		if (LitActor != nullptr )
 		{
 			FVector LanternLocation = GetActorLocation();
 			FLinearColor LanternColor = FLinearColor(LanternLocation.X, LanternLocation.Y, LanternLocation.Z, 1.f);
@@ -68,4 +84,3 @@ void ALantern::VerifyPositionToLitActors()
 		}
 	}
 }
-

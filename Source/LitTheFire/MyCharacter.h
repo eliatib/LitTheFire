@@ -47,13 +47,22 @@ protected:
 	UPROPERTY()
 	ALantern* LanternActor;
 
+
 public:
+	void SetLanternActor(ALantern* NewLanternActor)
+	{
+		LanternActor = NewLanternActor;
+	}
+
 	UFUNCTION(BlueprintCallable)
 	bool HasGrabLantern() const
 	{
 		return LanternActor != nullptr;
 	}
 
+	UPROPERTY(editanywhere, BlueprintReadOnly)
+	FName NextLevel = "Level1";
+	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
